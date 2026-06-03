@@ -11,41 +11,47 @@
  */
 int delete_dnodeint_at_index(dlistint_t **head, unsigned int index)
 {
-	dlistint_t *current;
+	dlistint_t *node;
 	unsigned int i;
 
 	if (head == NULL || *head == NULL)
 		return (-1);
 
-	current = *head;
+	node = *head;
 	i = 0;
 
-	while (current != NULL && i < index)
+	while (node != NULL && i < index)
 	{
-		current = current->next;
+		node = node->next;
 		i++;
 	}
 
-	if (current == NULL)
+	if (node == NULL)
 		return (-1);
 
-	/*
-	 * If current->prev is not NULL, the node is not the first one.
-	 * So we connect the previous node to the next node.
-	 */
-	if (current->prev != NULL)
-		current->prev->next = current->next;
+	if (node->prev != NULL)
+	{
+		/*
+		 * The previous node must point to the node after the deleted one.
+		 * The original code changed prev->prev, which broke the list links.
+		 */
+		node->prev->next = node->next;
+	}
 	else
-		*head = current->next;
+	{
+		*head = node->next;
+	}
 
-	/*
-	 * If current->next is not NULL, the node is not the last one.
-	 * So we connect the next node back to the previous node.
-	 */
-	if (current->next != NULL)
-		current->next->prev = current->prev;
+	if (node->next != NULL)
+	{
+		/*
+		 * The next node must point back to the node before the deleted one.
+		 * This must be done before freeing node to avoid using freed memory.
+		 */
+		node->next->prev = node->prev;
+	}
 
-	free(current);
+	free(node);
 
 	return (1);
 }
