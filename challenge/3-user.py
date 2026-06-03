@@ -40,9 +40,6 @@ class User():
         if pwd is None or type(pwd) is not str:
             self.__password = None
         else:
-            # The hash must be stored in __password, not _password.
-            # __password is the private attribute used by the getter
-            # and by is_valid_password().
             self.__password = hashlib.md5(pwd.encode()).hexdigest().lower()
 
     def is_valid_password(self, pwd):
@@ -57,9 +54,6 @@ class User():
             return False
         if self.__password is None:
             return False
-
-        # The stored hash is lowercase, so the hash used for comparison
-        # must also be lowercase. If we use upper(), the strings will not match.
         return hashlib.md5(pwd.encode()).hexdigest().lower() == self.__password
 
 
@@ -107,4 +101,3 @@ password")
     if user_2.is_valid_password("No pwd"):
         print("is_valid_password should return False if no password set \
 before")
-        
